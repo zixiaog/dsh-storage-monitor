@@ -1,4 +1,4 @@
-﻿# dsh-storage-monitor · 设计说明
+# dsh-storage-monitor · 设计说明
 
 > DSH 存储空间监测与安全清理插件
 > 版本 0.1.0 · 适用于 DeepSeek Harness Desktop（profile: desktop）
@@ -379,7 +379,7 @@ plugin_manager install_bundle  target = <本目录绝对路径>
   （其中 `sn-mes-hdrd` 978.8MB / 79,929 文件，`桥梁方案` 286MB，`default` 166MB；
   嵌套的 `qq/agent-workspace` 不重复计入）；之后报告仍为 2.9 秒；
 - Client bundle 通过 combo URL（`/plugins/??dsh-storage-monitor/client.js&rev=...`）返回
-  200 / `text/javascript`（130,761 bytes，v2 模块化界面）；
+  200 / `text/javascript`（142,516 bytes，v2 模块化界面）；
 - 删除闭环在空会话 `session-03e93ffd-…` 上实测：移入回收站 → 报告列表消失 → 回收站可见 →
   恢复 → 会话回到列表 → 永久删除 → 列表与回收站均清空；
   删除时附件核对（`deleteAttachments: true`）实测耗时 7.3 秒（29 个会话），共享附件保留逻辑未误删；
@@ -387,6 +387,10 @@ plugin_manager install_bundle  target = <本目录绝对路径>
   （profile → 其它盘检查通过，返回文件数/所需空间）；`/api/migrate/scripts` 200，生成
   switch/rollback `.ps1` + `.bat`，`.ps1` 带 UTF-8 BOM；`/api/migrate/copy/start` 启动 robocopy
   任务、轮询 running、cancel 成功；独立测试中 266MB / 12.6k 文件的预拷贝耗时约 41 秒；
+- 智能一键迁移：生成 `run-*.ps1`（含倒计时、优雅/强制关闭、robocopy 进度、Junction 验证、
+  删除备份、自动重启、失败回滚），通过 PowerShell 语法解析；启动信息（execPath / argv / cwd）
+  已捕获（当前实例为 `DeepSeek Harness.exe` + 6 个内部参数）；`/api/migrate/verify` 返回空结果；
+  实际切换**未执行**（会关闭当前 DSH），首次使用建议先保留备份；
 - 渲染冒烟测试：概览、分类、会话、建议、回收站、迁移（空闲/校验通过/校验失败/拷贝中/拷贝完成/
   已生成脚本/已映射+回滚）、删除/永久删除弹窗、加载/错误/未测量状态全部通过；
 - 切换脚本本身**未实际执行**（执行会退出当前 DSH 进程，从而中断本会话）；脚本逻辑已通过
