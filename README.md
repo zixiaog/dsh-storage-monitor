@@ -60,22 +60,54 @@ DeepSeek Harness（DSH）的**存储空间监测、清理与路径迁移**插件
 
 ## 安装
 
+> 在**另一台电脑**上安装时，推荐方式 A：不需要克隆仓库，DSH 的插件管理器会直接从 GitHub 拉取。
+
+### 方式 A：直接从 GitHub 安装（推荐）
+
+1. 打开 DSH Desktop → 左侧栏 **Plugins（插件）**页面；
+2. 点安装 / Add bundle，选择从 **Git / URL** 安装，填入：
+
+   ```text
+   https://github.com/zixiaog/dsh-storage-monitor.git
+   ```
+
+3. 安装完成后启用 `dsh-storage-monitor` bundle，刷新 DSH Web 页面；
+4. 左侧栏出现「存储空间」入口。
+
+也可以直接对 DSH 的 agent 说：
+
+```text
+安装插件 bundle：https://github.com/zixiaog/dsh-storage-monitor.git
+```
+
+agent 会调用 `plugin_manager install_bundle`（需要 `danger-full-access` 或逐次批准）。
+
+> 如果 GitHub 访问慢或超时，先在系统/终端里配置好代理再安装；也可以改用方式 B 下载 ZIP。
+
+### 方式 B：从本地目录安装
+
 1. 克隆或下载本仓库到本机：
 
    ```powershell
    git clone https://github.com/zixiaog/dsh-storage-monitor.git
    ```
 
-2. 在 DSH「插件管理」中使用**从本地目录安装**，选择该仓库目录；
-   或让 DSH 的 agent 执行：
+   或在 GitHub 页面 **Code → Download ZIP** 后解压。
+
+2. 在 DSH 插件页使用**从本地目录安装**，选择该目录；
+   或让 agent 执行：
 
    ```text
    plugin_manager install_bundle  target = <本仓库绝对路径>
    ```
 
-3. 刷新 DSH Web 页面，左侧栏出现「存储空间」入口。
-4. 卸载时在插件管理页移除 bundle 即可；本插件不会写入 profile 配置，
-   只会在 `<DSH_HOME>/storage-monitor/` 下保留回收站与迁移脚本。
+3. 启用 bundle，刷新 DSH Web 页面，左侧栏出现「存储空间」入口。
+
+卸载时在插件管理页移除 bundle 即可；本插件不会写入 profile 配置，
+只会在 `<DSH_HOME>/storage-monitor/` 下保留回收站与迁移脚本。
+
+> 路径迁移/一键迁移依赖 Windows NTFS Junction，仅 Windows 支持；
+> 统计、清理、会话管理功能本身是纯 Node 实现。
 
 ---
 
