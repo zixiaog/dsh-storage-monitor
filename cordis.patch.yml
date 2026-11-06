@@ -1,0 +1,5 @@
+# dsh-storage-monitor bundle patch
+# 只插入本插件一行：Host 侧注册 HTTP 路由与 storage_inspect 工具，Client 侧注册「存储空间」页面。
+- insert:
+    - id: dsh-storage-monitor
+      name: 'dsh-storage-monitor'

@@ -1,0 +1,35 @@
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependencies / build output
+node_modules/
+dist/
+out/
+build/
+coverage/
+
+# Local env / editor
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary / local test artifacts
+*.tmp
+*.bak
+*.orig
+_stm_*
+*.pre-migration-*
+*-migration/

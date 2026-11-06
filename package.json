@@ -1,0 +1,63 @@
+{
+  "name": "dsh-storage-monitor",
+  "version": "0.1.0",
+  "description": "DSH 存储空间监测与清理插件：分类统计插件、缓存、会话、附件与工作区占用，图表展示，安全清理，会话彻底删除与回收站，支持把 DSH 数据目录迁移到其它磁盘并保留原路径映射。",
+  "type": "module",
+  "license": "MIT",
+  "author": "zixiaog",
+  "homepage": "https://github.com/zixiaog/dsh-storage-monitor#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zixiaog/dsh-storage-monitor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zixiaog/dsh-storage-monitor/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "storage",
+    "disk-usage",
+    "cleanup",
+    "session",
+    "migration",
+    "junction",
+    "windows"
+  ],
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "lib/*.js",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "test": "node scripts/check.mjs"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}

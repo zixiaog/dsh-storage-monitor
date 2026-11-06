@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Storage",
+    "description": "Classified storage usage for plugins, caches, sessions, attachments and workspaces, with charts, safe-cleanup advice, and permanent session deletion."
+  }
+}
