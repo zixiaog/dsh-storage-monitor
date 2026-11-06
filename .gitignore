@@ -33,3 +33,8 @@ desktop.ini
 _stm_*
 *.pre-migration-*
 *-migration/
+
+# npm local cache/logs used for publishing from a sandboxed workspace
+.npm-cache/
+.npm-logs/
+*.tgz
