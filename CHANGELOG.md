@@ -4,6 +4,19 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.1] - 2026-11-06
+
+### Fixed
+
+- **迁移/回滚控制台自动启动**：生成脚本后通过 `Start-Process` 打开独立控制台，并用脚本开头的
+  `.started` 标记确认窗口真的启动；失败时回退到 `cmd start`，仍失败则返回明确错误和手动命令，
+  不再出现“生成了脚本但没有任何窗口”的静默失败。
+- **迁移后重启 DSH 的 Chromium 缓存报错**：关闭 DSH 时在优雅关闭超时后清理残留的 Electron /
+  GPU / renderer 进程，并等待进程全部退出、端口释放后再重启，避免
+  `Unable to move/create cache`、`GPU Cache Creation failed`。
+- **回滚一键化**：映射状态页新增「生成并启动回滚控制台」，自动关闭 DSH、移除 Junction、
+  把数据复制回原盘并自动重启 DSH；失败时自动恢复 Junction，保证 DSH 仍可启动。
+
 ## [0.1.0] - 2026-11-06
 
 ### Added

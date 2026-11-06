@@ -248,6 +248,8 @@ window.__ModuleLoader__.load({
       'mig.mappedTo': '数据在 {target}',
       'mig.unmapped': '未映射',
       'mig.rollback': '生成回滚脚本',
+      'mig.rollbackAuto': '生成并启动回滚控制台',
+      'mig.rollbackAutoHint': '自动关闭 DSH、移除映射、把数据复制回原盘，完成后自动重启 DSH。',
       'mig.rollbackHint': '回滚会把数据搬回原盘并移除原路径的 Junction，同样需要先退出 DSH。',
       'mig.onlyWindows': '路径映射迁移目前仅支持 Windows（NTFS Junction）。',
       'mig.recommended': '推荐',
@@ -514,6 +516,8 @@ window.__ModuleLoader__.load({
       'mig.mappedTo': 'Data lives at {target}',
       'mig.unmapped': 'Not mapped',
       'mig.rollback': 'Generate rollback script',
+      'mig.rollbackAuto': 'Launch rollback console',
+      'mig.rollbackAutoHint': 'Closes DSH, removes the junction, copies data back to the original drive, then restarts DSH.',
       'mig.rollbackHint': 'Rollback moves data back to the original drive and removes the junction. DSH must be closed.',
       'mig.onlyWindows': 'Path migration currently supports Windows only (NTFS junction).',
       'mig.recommended': 'Recommended',
@@ -2086,10 +2090,34 @@ window.__ModuleLoader__.load({
                   ),
                   h('span', { style: { fontSize: 11.5, fontVariantNumeric: 'tabular-nums' } }, human(item.bytes)),
                   item.isJunction
-                    ? h(Btn, { small: true, variant: 'danger', onClick: () => props.onGenerateRollback(item.key), loading: props.generating }, t('mig.rollback'))
+                    ? h(
+                        'div',
+                        { className: 'stm-chip-row' },
+                        h(
+                          Btn,
+                          {
+                            small: true,
+                            variant: 'primary',
+                            onClick: () => props.onLaunchRollback(item.key),
+                            loading: props.launchingRollback,
+                          },
+                          t('mig.rollbackAuto'),
+                        ),
+                        h(
+                          Btn,
+                          {
+                            small: true,
+                            variant: 'danger',
+                            onClick: () => props.onGenerateRollback(item.key),
+                            loading: props.generating,
+                          },
+                          t('mig.rollback'),
+                        ),
+                      )
                     : null,
                 ),
               ),
+              h('div', { className: 'stm-field-hint', style: { marginTop: 4 } }, t('mig.rollbackAutoHint')),
               verification?.verified
                 ? h(
                     'div',
@@ -2291,6 +2319,7 @@ window.__ModuleLoader__.load({
       const [smartAutoRestart, setSmartAutoRestart] = useState(true)
       const [smartKeepBackup, setSmartKeepBackup] = useState(false)
       const [launching, setLaunching] = useState(false)
+      const [launchingRollback, setLaunchingRollback] = useState(false)
       const [launched, setLaunched] = useState(null)
 
       const toastTimer = useRef(null)
@@ -2504,6 +2533,21 @@ window.__ModuleLoader__.load({
         }
       }, [sourceKey, target, excludeCache, smartAutoRestart, smartKeepBackup, notify, t])
 
+      const launchRollback = useCallback(async (key) => {
+        setLaunchingRollback(true)
+        try {
+          await api('/api/migrate/run', {
+            method: 'POST',
+            body: { sourceKey: key, mode: 'rollback', autoRestart: true },
+          })
+          notify(t('toast.scriptReady'))
+        } catch (cause) {
+          notify(t('toast.failed', { message: cause instanceof Error ? cause.message : String(cause) }))
+        } finally {
+          setLaunchingRollback(false)
+        }
+      }, [notify, t])
+
       const copyCommand = useCallback(async (text) => {
         if (!text) return
         const ok = await copyText(text)
@@ -2689,6 +2733,7 @@ window.__ModuleLoader__.load({
             smartAutoRestart,
             smartKeepBackup,
             launching,
+            launchingRollback,
             launched,
             onRefresh: () => void loadMigration(true),
             onSelectSource: selectSource,
@@ -2697,6 +2742,7 @@ window.__ModuleLoader__.load({
             onSmartAutoRestart: setSmartAutoRestart,
             onSmartKeepBackup: setSmartKeepBackup,
             onLaunchSmart: () => void launchSmart(),
+            onLaunchRollback: (key) => void launchRollback(key),
             onSuggestTarget: () => {
               if (migration?.suggestedTarget) setTarget(migration.suggestedTarget)
             },
