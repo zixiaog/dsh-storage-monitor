@@ -4,6 +4,15 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.2] - 2026-11-06
+
+### Fixed
+
+- **浅色 brand 主题下按钮文字不可见**：部分皮肤把 `--dsw-alias-brand-primary` 设为接近白色，
+  v0.1.1 的主按钮用该 token 做背景 + 白字，导致「重新扫描」「校验目标」「生成并启动迁移控制台」
+  等按钮变成白块。现在主按钮、步骤序号、选中态、开关、进度条、聚焦边框统一使用插件自带的
+  高对比强调色（`#3b5bdb`），不再依赖皮肤 brand token；标签/图标也同步修正。
+
 ## [0.1.1] - 2026-11-06
 
 ### Fixed
