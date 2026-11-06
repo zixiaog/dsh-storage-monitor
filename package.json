@@ -38,6 +38,7 @@
     "lib/*.js",
     "locale/*.json",
     "icon.svg",
+    "scripts/*.mjs",
     "README.md",
     "LICENSE"
   ],
