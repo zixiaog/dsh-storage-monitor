@@ -51,7 +51,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=20"
   },
   "dsh": {
     "bundle": {
