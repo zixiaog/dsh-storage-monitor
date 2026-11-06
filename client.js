@@ -268,6 +268,9 @@ window.__ModuleLoader__.load({
       'mig.smart.launching': '正在启动控制台…',
       'mig.smart.launched': '控制台已启动：{path}',
       'mig.smart.closing': 'DSH 即将关闭，请切换到迁移控制台窗口查看进度。',
+      'mig.launchingOverlay': '正在启动迁移控制台…',
+      'mig.rollback.launchingOverlay': '正在启动回滚控制台…',
+      'mig.launchingHint': '正在生成脚本并等待独立控制台窗口出现，通常需要 5–15 秒，请保持页面打开。',
       'mig.smart.needValidate': '先完成校验再启动智能迁移。',
       'mig.verify.title': '迁移验证',
       'mig.verify.ok': '验证通过',
@@ -536,6 +539,9 @@ window.__ModuleLoader__.load({
       'mig.smart.launching': 'Launching console…',
       'mig.smart.launched': 'Console launched: {path}',
       'mig.smart.closing': 'DSH is about to close. Switch to the migration console to watch progress.',
+      'mig.launchingOverlay': 'Starting the migration console…',
+      'mig.rollback.launchingOverlay': 'Starting the rollback console…',
+      'mig.launchingHint': 'Generating the script and waiting for the detached console window. This usually takes 5–15 seconds; keep this page open.',
       'mig.smart.needValidate': 'Validate the target before starting smart migration.',
       'mig.verify.title': 'Migration verification',
       'mig.verify.ok': 'Verified',
@@ -845,6 +851,10 @@ window.__ModuleLoader__.load({
 .stm-radio{display:flex;gap:8px;align-items:flex-start;font-size:12px;padding:7px 0;cursor:pointer;line-height:1.5}
 .stm-radio input{margin-top:2px;accent-color:var(--stm-accent)}
 .stm-toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);z-index:1100;background:var(--dsw-alias-toast-bg,#1f2937);color:#fff;padding:9px 16px;border-radius:11px;font-size:12px;box-shadow:0 12px 34px rgba(0,0,0,.32);max-width:70vw;animation:stm-toast .2s ease}
+.stm-launch-mask{position:fixed;inset:0;z-index:1200;background:var(--dsw-alias-bg-mask-drop,rgba(0,0,0,.5));display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.stm-launch-card{display:flex;align-items:center;gap:16px;max-width:460px;background:var(--dsw-alias-bg-base);border:1px solid var(--dsw-alias-border-l1);border-radius:18px;padding:20px 24px;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.stm-launch-title{font-size:14px;font-weight:650;letter-spacing:-.01em}
+.stm-launch-hint{font-size:11.5px;color:var(--dsw-alias-label-tertiary);margin-top:4px;line-height:1.55}
 @keyframes stm-toast{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 .stm-skel{height:92px;border-radius:16px;background:linear-gradient(90deg,var(--dsw-alias-bg-layer-1) 25%,var(--dsw-alias-bg-layer-2) 37%,var(--dsw-alias-bg-layer-1) 63%);background-size:400% 100%;animation:stm-shimmer 1.3s ease infinite}
 @keyframes stm-shimmer{0%{background-position:100% 0}100%{background-position:0 0}}
@@ -1049,6 +1059,24 @@ window.__ModuleLoader__.load({
 
     function Toast(props) {
       return props.message ? h('div', { className: 'stm-toast', role: 'status' }, props.message) : null
+    }
+
+    function LaunchOverlay(props) {
+      return h(
+        'div',
+        { className: 'stm-launch-mask', role: 'alertdialog', 'aria-live': 'polite', 'aria-label': props.title },
+        h(
+          'div',
+          { className: 'stm-launch-card' },
+          h('span', { className: 'stm-spin', style: { width: 22, height: 22, borderWidth: 3 } }),
+          h(
+            'div',
+            null,
+            h('div', { className: 'stm-launch-title' }, props.title),
+            h('div', { className: 'stm-launch-hint' }, props.hint),
+          ),
+        ),
+      )
     }
 
     function Modal(props) {
@@ -2836,6 +2864,12 @@ window.__ModuleLoader__.load({
           ),
           renderBody(),
         ),
+        launching || launchingRollback
+          ? h(LaunchOverlay, {
+              title: launchingRollback ? t('mig.rollback.launchingOverlay') : t('mig.launchingOverlay'),
+              hint: t('mig.launchingHint'),
+            })
+          : null,
         h(DeleteModal, {
           t,
           modal,
