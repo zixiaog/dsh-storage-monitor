@@ -1,6 +1,7 @@
 # dsh-storage-monitor
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![npm](https://img.shields.io/npm/v/dsh-storage-monitor.svg)](https://www.npmjs.com/package/dsh-storage-monitor)
 [![platform](https://img.shields.io/badge/platform-Windows%20%7C%20DSH%20Desktop-lightgrey)](#requirements)
 [![DSH](https://img.shields.io/badge/DSH-0.2.x-4d6bfe)](https://github.com/deepseek-ai)
 [![check](https://github.com/zixiaog/dsh-storage-monitor/actions/workflows/check.yml/badge.svg)](https://github.com/zixiaog/dsh-storage-monitor/actions/workflows/check.yml)
@@ -60,11 +61,42 @@ DeepSeek Harness（DSH）的**存储空间监测、清理与路径迁移**插件
 
 ## 安装
 
-> 在**另一台电脑**上安装时，推荐方式 A：不需要克隆仓库，DSH 的插件管理器会直接从 GitHub 拉取。
+> 在**另一台电脑**上安装时，推荐方式 A（npm）或方式 B（GitHub），都不需要手动构建。
 
-### 方式 A：直接从 GitHub 安装（推荐）
+### 方式 A：从 npm 安装（推荐）
+
+包名：**`dsh-storage-monitor`** · npm 页面：https://www.npmjs.com/package/dsh-storage-monitor
 
 1. 打开 DSH Desktop → 左侧栏 **Plugins（插件）**页面；
+2. 点安装 / Add bundle，输入 npm 包名：
+
+   ```text
+   dsh-storage-monitor
+   ```
+
+   或指定版本：
+
+   ```text
+   dsh-storage-monitor@0.1.0
+   ```
+
+3. 安装完成后启用 `dsh-storage-monitor` bundle，刷新 DSH Web 页面；
+4. 左侧栏出现「存储空间」入口。
+
+也可以直接对 DSH 的 agent 说：
+
+```text
+安装插件 bundle：dsh-storage-monitor
+```
+
+agent 会调用 `plugin_manager install_bundle`（需要 `danger-full-access` 或逐次批准）。
+
+> 国内网络如果访问 npm 官方 registry 慢，可让 DSH/pnpm 使用镜像（例如
+> `https://registry.npmmirror.com/`）；镜像同步新发布的包可能有延迟。
+
+### 方式 B：直接从 GitHub 安装
+
+1. 打开 DSH Desktop → **Plugins（插件）**页面；
 2. 点安装 / Add bundle，选择从 **Git / URL** 安装，填入：
 
    ```text
@@ -80,11 +112,9 @@ DeepSeek Harness（DSH）的**存储空间监测、清理与路径迁移**插件
 安装插件 bundle：https://github.com/zixiaog/dsh-storage-monitor.git
 ```
 
-agent 会调用 `plugin_manager install_bundle`（需要 `danger-full-access` 或逐次批准）。
+> 如果 GitHub 访问慢或超时，先在系统/终端里配置好代理再安装；也可以改用方式 C 下载 ZIP。
 
-> 如果 GitHub 访问慢或超时，先在系统/终端里配置好代理再安装；也可以改用方式 B 下载 ZIP。
-
-### 方式 B：从本地目录安装
+### 方式 C：从本地目录安装
 
 1. 克隆或下载本仓库到本机：
 
