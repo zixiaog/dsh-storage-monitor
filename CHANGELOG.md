@@ -4,6 +4,18 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.4] - 2026-11-07
+
+### Fixed
+
+- **迁移后卸载/安装插件报 `ERR_PNPM_UNEXPECTED_STORE`**：跨盘迁移 DSH_HOME 后，
+  profile 的 `node_modules/.modules.yaml` 仍记录旧盘的 pnpm store，而 DSH 已按新盘选择
+  store，导致所有插件安装/卸载失败。一键迁移和回滚现在会在切换数据目录后自动检查
+  `storeDir` 与 profile 所在盘是否一致；不一致时用 DSH 自带的 node/pnpm 在 profile 里执行
+  `pnpm install --force`，把依赖重新链接到新盘的 store，然后再重启 DSH。
+- 自动修复失败不会回滚已完成的迁移，只在控制台日志里给出手动修复命令，避免数据目录状态
+  被二次破坏。
+
 ## [0.1.3] - 2026-11-06
 
 ### Fixed
