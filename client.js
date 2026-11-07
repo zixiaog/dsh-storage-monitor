@@ -255,12 +255,13 @@ window.__ModuleLoader__.load({
       'mig.rollbackAuto': '生成并启动回滚控制台',
       'mig.rollbackAutoHint': '自动关闭 DSH、移除映射、把数据复制回原盘，完成后自动重启 DSH。',
       'mig.pnpmStoreTitle': 'pnpm 依赖存储',
-      'mig.pnpmStoreHint': '迁移后插件安装/卸载报 ERR_PNPM_UNEXPECTED_STORE 时，用这里修正 pnpm 记录；只改 metadata，不重装依赖。',
-      'mig.pnpmStoreOk': 'storeDir 与当前磁盘一致',
-      'mig.pnpmStoreMismatch': 'pnpm store 仍指向旧盘',
-      'mig.pnpmStoreDetail': '当前记录：{current}；应改为：{expected}',
-      'mig.pnpmStoreRepair': '修复 pnpm store 记录',
-      'mig.pnpmStoreFixed': '已修复 pnpm store 记录（原记录：{store}）',
+      'mig.pnpmStoreHint': '迁移后插件安装/卸载报 ERR_PNPM_UNEXPECTED_STORE 或 ERR_PNPM_UNEXPECTED_VIRTUAL_STORE 时，用这里修正 pnpm 记录（storeDir 与 virtualStoreDir）；只改 metadata，不重装依赖。',
+      'mig.pnpmStoreOk': 'pnpm store 记录与当前路径一致',
+      'mig.pnpmStoreMismatch': 'pnpm store 记录仍指向旧路径',
+      'mig.pnpmStoreDetail': 'storeDir：{current} → {expected}',
+      'mig.pnpmStoreDetailVirtual': 'virtualStoreDir：{current} → {expected}',
+      'mig.pnpmStoreRepair': '修复 pnpm 记录',
+      'mig.pnpmStoreFixed': '已修复 pnpm 记录（原 storeDir：{store}）',
       'mig.rollbackHint': '回滚会把数据搬回原盘并移除原路径的 Junction，同样需要先退出 DSH。',
       'mig.onlyWindows': '路径映射迁移目前仅支持 Windows（NTFS Junction）。',
       'mig.recommended': '推荐',
@@ -535,12 +536,13 @@ window.__ModuleLoader__.load({
       'mig.rollbackAuto': 'Launch rollback console',
       'mig.rollbackAutoHint': 'Closes DSH, removes the junction, copies data back to the original drive, then restarts DSH.',
       'mig.pnpmStoreTitle': 'pnpm dependency store',
-      'mig.pnpmStoreHint': 'If plugin install/uninstall fails with ERR_PNPM_UNEXPECTED_STORE after migration, fix the pnpm record here. Metadata only; no dependency reinstall.',
-      'mig.pnpmStoreOk': 'storeDir matches the current drive',
-      'mig.pnpmStoreMismatch': 'pnpm store still points to the old drive',
-      'mig.pnpmStoreDetail': 'Current: {current}; expected: {expected}',
-      'mig.pnpmStoreRepair': 'Repair pnpm store record',
-      'mig.pnpmStoreFixed': 'pnpm store record repaired (was: {store})',
+      'mig.pnpmStoreHint': 'If plugin install/uninstall fails with ERR_PNPM_UNEXPECTED_STORE or ERR_PNPM_UNEXPECTED_VIRTUAL_STORE after migration, fix the pnpm records here (storeDir and virtualStoreDir). Metadata only; no dependency reinstall.',
+      'mig.pnpmStoreOk': 'pnpm store records match the current paths',
+      'mig.pnpmStoreMismatch': 'pnpm store records still point to the old paths',
+      'mig.pnpmStoreDetail': 'storeDir: {current} → {expected}',
+      'mig.pnpmStoreDetailVirtual': 'virtualStoreDir: {current} → {expected}',
+      'mig.pnpmStoreRepair': 'Repair pnpm records',
+      'mig.pnpmStoreFixed': 'pnpm records repaired (old storeDir: {store})',
       'mig.rollbackHint': 'Rollback moves data back to the original drive and removes the junction. DSH must be closed.',
       'mig.onlyWindows': 'Path migration currently supports Windows only (NTFS junction).',
       'mig.recommended': 'Recommended',
@@ -2221,10 +2223,19 @@ window.__ModuleLoader__.load({
                 title: pnpmStore.needsRepair ? t('mig.pnpmStoreMismatch') : t('mig.pnpmStoreOk'),
               },
               pnpmStore.needsRepair
-                ? t('mig.pnpmStoreDetail', {
-                    current: pnpmStore.storeDir || '-',
-                    expected: pnpmStore.expectedStore || '-',
-                  })
+                ? [
+                    t('mig.pnpmStoreDetail', {
+                      current: pnpmStore.storeDir || '-',
+                      expected: pnpmStore.expectedStore || '-',
+                    }),
+                    pnpmStore.virtualStoreDir || pnpmStore.expectedVirtualStore
+                      ? '\n' +
+                        t('mig.pnpmStoreDetailVirtual', {
+                          current: pnpmStore.virtualStoreDir || '-',
+                          expected: pnpmStore.expectedVirtualStore || '-',
+                        })
+                      : '',
+                  ].join('')
                 : '',
             ),
             pnpmStore.needsRepair

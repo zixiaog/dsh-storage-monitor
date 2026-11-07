@@ -4,6 +4,25 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.11] - 2026-11-07
+
+### Fixed
+
+- **迁移后插件安装/卸载报 `ERR_PNPM_UNEXPECTED_STORE` / `ERR_PNPM_UNEXPECTED_VIRTUAL_STORE` 的三个根因**：
+  1. **修复与重链现在先把 profile 解析为真实路径再执行**。之前用 Junction 逻辑路径
+     （`C:\Users\<user>\.dsh\...`）跑 pnpm，pnpm 按 cwd 判定项目所在盘，会认为项目
+     仍在旧盘并把 `storeDir` 写回 `C:\...\store`；而 DSH 插件管理器用真实路径
+     （`D:\...\profiles\desktop`）跑 pnpm，两边永远不一致。控制台脚本改用 DSH 自带
+     node 的 `fs.realpathSync` 解析真实路径，插内检测同样先 `realpath` 再判断盘符。
+  2. **非系统盘 store 约定修正**：由 `<盘符>:\pnpm-store`（0.1.8 起的错误规则）改为
+     pnpm 实际使用的 `<盘符>\.pnpm-store\v<major>`（插件管理器失败日志
+     `Using the store at D:\.pnpm-store\v11 instead` 与 `pnpm store path` 实证）。
+  3. **修复现在同时修正 `virtualStoreDir`**：指向真实路径下的 `node_modules\.pnpm`，
+     并清理记录旧项目路径的 `.pnpm-workspace-state-v1.json` 缓存。之前只改
+     `storeDir`，修完立刻撞上 `ERR_PNPM_UNEXPECTED_VIRTUAL_STORE`。
+- pnpm 依赖存储卡片现在同时显示 `storeDir` 与 `virtualStoreDir` 的当前/期望值，
+  文案同时提及两种错误码。
+
 ## [0.1.10] - 2026-11-07
 
 ### Fixed

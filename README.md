@@ -182,16 +182,14 @@ agent 会调用 `plugin_manager install_bundle`（需要 `danger-full-access` �
 - 不要把目标放在移动硬盘/U 盘（盘未连接时 DSH 会打不开）；
 - 迁移完成后原路径仍然是 `C:\Users\<user>\.dsh`，只是变成了 Junction。
 
-> **v0.1.8+**：跨盘迁移后如果 profile 的 pnpm store 仍指向旧盘，卸载/安装插件会报
-> `ERR_PNPM_UNEXPECTED_STORE`。一键迁移/回滚会先按 DSH 的非系统盘规则（`<盘符>:\pnpm-store\v11`）
-> 修正 `node_modules/.modules.yaml` 的 `storeDir`，再在重启 DSH 前自动执行
-> `pnpm install --force --store-dir <新盘 store>` 完整重链依赖；重链失败不阻塞重启，
+> **v0.1.11+**：跨盘迁移后插件安装/卸载报 `ERR_PNPM_UNEXPECTED_STORE` 或
+> `ERR_PNPM_UNEXPECTED_VIRTUAL_STORE`，多半是 `node_modules/.modules.yaml` 里的
+> `storeDir` / `virtualStoreDir` 还指向旧盘。打开 **迁移 → 映射状态 → pnpm 依赖存储**，
+> 点击「修复 pnpm 记录」即可：插件会先把 profile 解析为真实路径（避免 Junction 逻辑
+> 路径把期望值算回旧盘），优先读取最近一次插件管理器失败日志里 DSH 实际使用的路径，
+> 一次修正 `storeDir` 与 `virtualStoreDir` 并自动备份，不重装依赖。一键迁移/回滚的
+> 控制台脚本同样按真实路径执行修复与 `pnpm install --force` 重链；重链失败不阻塞重启，
 > 并会打印手动命令。
->
-> **v0.1.10+**：如果迁移后插件安装/卸载报 `ERR_PNPM_UNEXPECTED_STORE`，直接打开
-> **迁移 → 映射状态 → pnpm 依赖存储**，点击「修复 pnpm store 记录」即可；插件会优先读取
-> 最近一次插件管理器失败日志里 DSH 实际使用的 store 路径，只改
-> `node_modules/.modules.yaml` 并自动备份，不重装依赖。
 >
 > 只迁移「DSH 数据目录」时，profile 位于该目录内部，会随父目录的 Junction 一起映射，
 > 不需要也不会单独创建 profile Junction；「映射状态」会显示「随数据目录映射」。
