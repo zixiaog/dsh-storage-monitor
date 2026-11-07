@@ -4,6 +4,16 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.6] - 2026-11-07
+
+### Changed
+
+- **pnpm store 修复改为只改 metadata，不重装依赖**：迁移/回滚切换数据目录后，先用 DSH
+  自带的 pnpm 查出新盘实际 store 路径，然后只把 `node_modules/.modules.yaml` 里的
+  `storeDir` 改为该路径并备份原文件。这样不会删除/重装 `node_modules`、不需要联网，
+  也不会因为插件依赖来自 GitHub/本地而失败；改完后 pnpm 的卸载/安装操作即可正常工作。
+- 只有 metadata 写入或校验失败时，才回退到原来的 `pnpm install --force` 兜底。
+
 ## [0.1.5] - 2026-11-07
 
 ### Fixed
