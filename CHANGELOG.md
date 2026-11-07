@@ -4,6 +4,17 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.9] - 2026-11-07
+
+### Added
+
+- **插件内 pnpm store 修复入口**：迁移 → 映射状态页新增「pnpm 依赖存储」卡片。
+  当 `node_modules/.modules.yaml` 的 `storeDir` 与当前盘不符时，直接点击
+  「修复 pnpm store 记录」即可修正 metadata，不需要手动编辑文件，也不会重装依赖。
+- 修复前自动备份 `.modules.yaml`；修复后卡片显示当前/期望 store 路径与修复结果。
+- 新增 Host API `POST /storage-monitor/api/migrate/repair-pnpm`，只接受同源请求，
+  仅修改当前 profile 的 pnpm metadata，不执行 pnpm install。
+
 ## [0.1.8] - 2026-11-07
 
 ### Fixed

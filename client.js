@@ -254,6 +254,13 @@ window.__ModuleLoader__.load({
       'mig.rollback': '生成回滚脚本',
       'mig.rollbackAuto': '生成并启动回滚控制台',
       'mig.rollbackAutoHint': '自动关闭 DSH、移除映射、把数据复制回原盘，完成后自动重启 DSH。',
+      'mig.pnpmStoreTitle': 'pnpm 依赖存储',
+      'mig.pnpmStoreHint': '迁移后插件安装/卸载报 ERR_PNPM_UNEXPECTED_STORE 时，用这里修正 pnpm 记录；只改 metadata，不重装依赖。',
+      'mig.pnpmStoreOk': 'storeDir 与当前磁盘一致',
+      'mig.pnpmStoreMismatch': 'pnpm store 仍指向旧盘',
+      'mig.pnpmStoreDetail': '当前记录：{current}；应改为：{expected}',
+      'mig.pnpmStoreRepair': '修复 pnpm store 记录',
+      'mig.pnpmStoreFixed': '已修复 pnpm store 记录（原记录：{store}）',
       'mig.rollbackHint': '回滚会把数据搬回原盘并移除原路径的 Junction，同样需要先退出 DSH。',
       'mig.onlyWindows': '路径映射迁移目前仅支持 Windows（NTFS Junction）。',
       'mig.recommended': '推荐',
@@ -527,6 +534,13 @@ window.__ModuleLoader__.load({
       'mig.rollback': 'Generate rollback script',
       'mig.rollbackAuto': 'Launch rollback console',
       'mig.rollbackAutoHint': 'Closes DSH, removes the junction, copies data back to the original drive, then restarts DSH.',
+      'mig.pnpmStoreTitle': 'pnpm dependency store',
+      'mig.pnpmStoreHint': 'If plugin install/uninstall fails with ERR_PNPM_UNEXPECTED_STORE after migration, fix the pnpm record here. Metadata only; no dependency reinstall.',
+      'mig.pnpmStoreOk': 'storeDir matches the current drive',
+      'mig.pnpmStoreMismatch': 'pnpm store still points to the old drive',
+      'mig.pnpmStoreDetail': 'Current: {current}; expected: {expected}',
+      'mig.pnpmStoreRepair': 'Repair pnpm store record',
+      'mig.pnpmStoreFixed': 'pnpm store record repaired (was: {store})',
       'mig.rollbackHint': 'Rollback moves data back to the original drive and removes the junction. DSH must be closed.',
       'mig.onlyWindows': 'Path migration currently supports Windows only (NTFS junction).',
       'mig.recommended': 'Recommended',
@@ -2194,6 +2208,39 @@ window.__ModuleLoader__.load({
             ),
       )
 
+      const pnpmStore = props.status?.pnpmStore
+      const pnpmCard = pnpmStore?.exists
+        ? h(
+            Card,
+            null,
+            h(CardHead, { icon: 'package', title: t('mig.pnpmStoreTitle'), hint: t('mig.pnpmStoreHint') }),
+            h(
+              Callout,
+              {
+                level: pnpmStore.needsRepair ? 'warn' : 'success',
+                title: pnpmStore.needsRepair ? t('mig.pnpmStoreMismatch') : t('mig.pnpmStoreOk'),
+              },
+              pnpmStore.needsRepair
+                ? t('mig.pnpmStoreDetail', {
+                    current: pnpmStore.storeDir || '-',
+                    expected: pnpmStore.expectedStore || '-',
+                  })
+                : '',
+            ),
+            pnpmStore.needsRepair
+              ? h(
+                  'div',
+                  { className: 'stm-chip-row' },
+                  h(
+                    Btn,
+                    { variant: 'primary', onClick: () => props.onRepairPnpm(), loading: props.repairingPnpm },
+                    t('mig.pnpmStoreRepair'),
+                  ),
+                )
+              : null,
+          )
+        : null
+
       const modes = [
         ['smart', t('mig.flow.smart'), null],
         ['manual', t('mig.flow.manual'), null],
@@ -2238,7 +2285,7 @@ window.__ModuleLoader__.load({
             ? h('div', { className: 'stm-flow' }, sourceCard, targetCard, smartCard)
             : mode === 'manual'
               ? h('div', { className: 'stm-flow' }, sourceCard, targetCard, preCopyCard, scriptCard)
-              : statusCard,
+              : h('div', { className: 'stm-flow' }, statusCard, pnpmCard),
       )
     }
 
@@ -2362,6 +2409,7 @@ window.__ModuleLoader__.load({
       const [smartKeepBackup, setSmartKeepBackup] = useState(false)
       const [launching, setLaunching] = useState(false)
       const [launchingRollback, setLaunchingRollback] = useState(false)
+      const [repairingPnpm, setRepairingPnpm] = useState(false)
       const [launched, setLaunched] = useState(null)
 
       const toastTimer = useRef(null)
@@ -2590,6 +2638,20 @@ window.__ModuleLoader__.load({
         }
       }, [notify, t])
 
+      const repairPnpm = useCallback(async () => {
+        setRepairingPnpm(true)
+        try {
+          const result = await api('/api/migrate/repair-pnpm', { method: 'POST', body: {} })
+          if (result?.repaired) notify(t('mig.pnpmStoreFixed', { store: result.previousStore || '-' }))
+          else notify(t('mig.pnpmStoreOk'))
+          await loadMigration(true)
+        } catch (cause) {
+          notify(t('toast.failed', { message: cause instanceof Error ? cause.message : String(cause) }))
+        } finally {
+          setRepairingPnpm(false)
+        }
+      }, [notify, t, loadMigration])
+
       const copyCommand = useCallback(async (text) => {
         if (!text) return
         const ok = await copyText(text)
@@ -2776,6 +2838,7 @@ window.__ModuleLoader__.load({
             smartKeepBackup,
             launching,
             launchingRollback,
+            repairingPnpm,
             launched,
             onRefresh: () => void loadMigration(true),
             onSelectSource: selectSource,
@@ -2785,6 +2848,7 @@ window.__ModuleLoader__.load({
             onSmartKeepBackup: setSmartKeepBackup,
             onLaunchSmart: () => void launchSmart(),
             onLaunchRollback: (key) => void launchRollback(key),
+            onRepairPnpm: () => void repairPnpm(),
             onSuggestTarget: () => {
               if (migration?.suggestedTarget) setTarget(migration.suggestedTarget)
             },
