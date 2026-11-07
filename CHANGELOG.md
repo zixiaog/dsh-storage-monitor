@@ -4,6 +4,18 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.10] - 2026-11-07
+
+### Fixed
+
+- **pnpm store 检测误报“一致”**：0.1.9 只用“盘符 + pnpm-store”规则推测期望值，可能和 DSH
+  插件管理器实际使用的 store 不同。现在按优先级检测：
+  1. 最近一次插件管理器失败日志里的 `Using the store at ...` / `pnpm now wants to use the store at ...`
+     （DSH 自己 pnpm 实际选择，最可靠）；
+  2. 用 DSH 自带 pnpm 执行 `store path`；
+  3. 最后才回退到盘符规则。
+  卡片和修复按钮都使用检测到的真实路径，不会再出现“显示一致但卸载仍报错”。
+
 ## [0.1.9] - 2026-11-07
 
 ### Added
