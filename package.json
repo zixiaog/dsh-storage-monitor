@@ -1,6 +1,6 @@
 {
   "name": "dsh-storage-monitor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "DSH 存储空间监测与清理插件：分类统计插件、缓存、会话、附件与工作区占用，图表展示，安全清理，会话彻底删除与回收站，支持把 DSH 数据目录迁移到其它磁盘并保留原路径映射。",
   "type": "module",
   "license": "MIT",

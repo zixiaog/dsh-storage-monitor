@@ -249,6 +249,8 @@ window.__ModuleLoader__.load({
       'mig.mapped': '已映射',
       'mig.mappedTo': '数据在 {target}',
       'mig.unmapped': '未映射',
+      'mig.coveredByHome': '随数据目录映射',
+      'mig.coveredByHint': '位于已映射的 DSH 数据目录内，无需单独 Junction',
       'mig.rollback': '生成回滚脚本',
       'mig.rollbackAuto': '生成并启动回滚控制台',
       'mig.rollbackAutoHint': '自动关闭 DSH、移除映射、把数据复制回原盘，完成后自动重启 DSH。',
@@ -520,6 +522,8 @@ window.__ModuleLoader__.load({
       'mig.mapped': 'Mapped',
       'mig.mappedTo': 'Data lives at {target}',
       'mig.unmapped': 'Not mapped',
+      'mig.coveredByHome': 'Covered by DSH_HOME',
+      'mig.coveredByHint': 'Lives inside the mapped DSH data directory; no separate junction needed',
       'mig.rollback': 'Generate rollback script',
       'mig.rollbackAuto': 'Launch rollback console',
       'mig.rollbackAutoHint': 'Closes DSH, removes the junction, copies data back to the original drive, then restarts DSH.',
@@ -2113,10 +2117,18 @@ window.__ModuleLoader__.load({
                   h('div', { style: { flex: 1, minWidth: 200 } },
                     h('div', { style: { display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' } },
                       h('span', { style: { fontSize: 12, fontWeight: 600 } }, item.title),
-                      item.isJunction ? h(Tag, { color: T.success }, t('mig.mapped')) : h(Tag, { color: T.text3 }, t('mig.unmapped')),
+                      item.isJunction
+                        ? h(Tag, { color: T.success }, t('mig.mapped'))
+                        : item.coveredBy === 'dshHome'
+                          ? h(Tag, { color: T.success }, t('mig.coveredByHome'))
+                          : h(Tag, { color: T.text3 }, t('mig.unmapped')),
                     ),
                     h('div', { className: 'stm-cell-id' }, item.path),
-                    item.isJunction ? h('div', { className: 'stm-cell-sub' }, t('mig.mappedTo', { target: item.junctionTarget })) : null,
+                    item.isJunction
+                      ? h('div', { className: 'stm-cell-sub' }, t('mig.mappedTo', { target: item.junctionTarget }))
+                      : item.coveredBy === 'dshHome'
+                        ? h('div', { className: 'stm-cell-sub' }, t('mig.coveredByHint'))
+                        : null,
                   ),
                   h('span', { style: { fontSize: 11.5, fontVariantNumeric: 'tabular-nums' } }, human(item.bytes)),
                   item.isJunction

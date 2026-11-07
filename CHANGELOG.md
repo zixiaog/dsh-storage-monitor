@@ -4,6 +4,18 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.5] - 2026-11-07
+
+### Fixed
+
+- **迁移后 DSH 没有自动重启**：0.1.3/0.1.4 为了解析新端口，把 DSH 的 stdout/stderr
+  重定向到文件；部分 DSH/Electron 版本在重定向 stdio 后无法拉起 GUI。现在恢复普通
+  `Start-Process` 启动，不再重定向；改为检测 DSH 进程的主窗口和监听端口来确认启动成功。
+- **按回车不关闭迁移控制台**：脚本结束后显式调用 `[Environment]::Exit(0)`，避免
+  Windows Terminal / `cmd start` 环境里 PowerShell 已结束但标签页仍停留。
+- **profile 显示“未映射”**：当只迁移 DSH 数据目录时，profile 位于该目录内部，随父目录
+  Junction 一起映射，并不是漏掉。映射状态现在显示「随数据目录映射」并解释无需单独 Junction。
+
 ## [0.1.4] - 2026-11-07
 
 ### Fixed
