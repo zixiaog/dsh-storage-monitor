@@ -4,6 +4,17 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.7] - 2026-11-07
+
+### Changed
+
+- **迁移/回滚后自动执行完整 pnpm 重链**：metadata 修正成功后，脚本会在重启 DSH 之前
+  自动执行 `pnpm install --force --store-dir <新盘 store>`，把 profile 依赖真正重新链接到
+  新盘 store，而不只是改记录。这样后续插件安装/卸载处于完全一致的状态。
+- 重链放在 DSH 关闭时执行，避免运行中的 DSH 占用 `node_modules`；脚本顺序为
+  “修正 metadata → 完整重链 → 重启 DSH”，重启完成时重链已经结束。
+- 重链失败不会阻塞迁移或重启；metadata 已修正，仍可先卸载/安装插件，并会打印手动命令。
+
 ## [0.1.6] - 2026-11-07
 
 ### Changed

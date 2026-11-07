@@ -77,7 +77,7 @@ DeepSeek Harness（DSH）的**存储空间监测、清理与路径迁移**插件
    或指定版本：
 
    ```text
-   dsh-storage-monitor@0.1.6
+   dsh-storage-monitor@0.1.7
    ```
 
 3. 安装完成后启用 `dsh-storage-monitor` bundle，刷新 DSH Web 页面；
@@ -182,10 +182,11 @@ agent 会调用 `plugin_manager install_bundle`（需要 `danger-full-access` �
 - 不要把目标放在移动硬盘/U 盘（盘未连接时 DSH 会打不开）；
 - 迁移完成后原路径仍然是 `C:\Users\<user>\.dsh`，只是变成了 Junction。
 
-> **v0.1.6+**：跨盘迁移后如果 profile 的 pnpm store 仍指向旧盘，卸载/安装插件会报
-> `ERR_PNPM_UNEXPECTED_STORE`。一键迁移/回滚现在只修正
-> `node_modules/.modules.yaml` 的 `storeDir` 为新盘实际 store 路径，不重装依赖、不需要联网；
-> metadata 修复失败时才回退到 `pnpm install --force`，日志在迁移控制台里。
+> **v0.1.7+**：跨盘迁移后如果 profile 的 pnpm store 仍指向旧盘，卸载/安装插件会报
+> `ERR_PNPM_UNEXPECTED_STORE`。一键迁移/回滚会先修正
+> `node_modules/.modules.yaml` 的 `storeDir`，再在重启 DSH 前自动执行
+> `pnpm install --force --store-dir <新盘 store>` 完整重链依赖；重链失败不阻塞重启，
+> 并会打印手动命令。
 >
 > 只迁移「DSH 数据目录」时，profile 位于该目录内部，会随父目录的 Junction 一起映射，
 > 不需要也不会单独创建 profile Junction；「映射状态」会显示「随数据目录映射」。
