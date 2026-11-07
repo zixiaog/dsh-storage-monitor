@@ -4,6 +4,17 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.8] - 2026-11-07
+
+### Fixed
+
+- **迁移后插件安装/卸载仍报 `ERR_PNPM_UNEXPECTED_STORE`**：0.1.7 使用的是 `pnpm store path`
+  返回的默认值（非系统盘可能是 `<drive>:\.pnpm-store\v11`），而 DSH 自己使用的是
+  `<drive>:\pnpm-store\v11`，两者仍不一致。0.1.8 在非系统盘按 DSH 规则选择 store 路径，
+  metadata 修正和完整重链都使用该路径；C 盘仍使用 pnpm 默认 store。
+- 现在迁移到 D 盘后，pnpm store 是 `D:\pnpm-store\v11`，与 DSH 插件管理器一致，不再需要
+  先回退才能卸载/安装插件。
+
 ## [0.1.7] - 2026-11-07
 
 ### Changed
