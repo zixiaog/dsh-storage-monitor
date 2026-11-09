@@ -4,6 +4,17 @@
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/)，
 版本号遵循 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [0.1.12] - 2026-11-09
+
+### Fixed
+
+- **删除归档会话后侧边栏仍显示“未分组”幽灵项**：原来的顺序是先从 workspace 解绑、再
+  `unarchiveSession`；取消归档会把会话放回一个已没有 workspace 的槽位，DSH 侧边栏就把它
+  显示成“未分组”，点击报 `session/not-found`。现在改为先取消归档/固定，再解绑 workspace。
+- 会话页新增「清理幽灵会话」按钮：扫描 `workspace.sessionIds` 中已被删除的会话 id，
+  调用 unarchive/unpin/detach 清理引用，专门修复历史上已经产生的幽灵项。
+- 新增 Host API `POST /storage-monitor/api/ghost-sessions`。
+
 ## [0.1.11] - 2026-11-07
 
 ### Fixed

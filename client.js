@@ -145,6 +145,10 @@ window.__ModuleLoader__.load({
       'sessions.bulkDelete': '批量删除',
       'sessions.liveHint': '运行中的会话不可删除，请先停止。',
       'sessions.deepHint': '深度扫描后可看到每个会话独占的附件占用。',
+      'sessions.ghostClean': '清理幽灵会话',
+      'sessions.ghostHint': '清理侧边栏中指向已删除会话的未分组记录',
+      'sessions.ghostDone': '已清理 {n} 条幽灵会话记录',
+      'sessions.ghostNone': '没有发现幽灵会话记录',
       'sessions.empty': '没有匹配的会话',
       'sessions.total': '共 {n} 个会话',
       'sessions.attachment': '附件 {size}',
@@ -426,6 +430,10 @@ window.__ModuleLoader__.load({
       'sessions.bulkDelete': 'Delete selected',
       'sessions.liveHint': 'Running sessions cannot be deleted; stop them first.',
       'sessions.deepHint': 'Run a deep scan to see exclusive attachment usage per session.',
+      'sessions.ghostClean': 'Clean ghost sessions',
+      'sessions.ghostHint': 'Remove sidebar entries that point to deleted sessions',
+      'sessions.ghostDone': 'Removed {n} ghost session record(s)',
+      'sessions.ghostNone': 'No ghost session records found',
       'sessions.empty': 'No matching sessions',
       'sessions.total': '{n} sessions',
       'sessions.attachment': 'attachments {size}',
@@ -1640,6 +1648,12 @@ window.__ModuleLoader__.load({
               loading: props.deepScanning,
               title: t('action.deepHint'),
             }, deep ? t('action.deepDone') : t('action.deep')),
+            h(Btn, {
+              small: true,
+              onClick: props.onCleanGhosts,
+              loading: props.cleaningGhosts,
+              title: t('sessions.ghostHint'),
+            }, t('sessions.ghostClean')),
           ),
           selected.size > 0
             ? h(
@@ -2394,6 +2408,7 @@ window.__ModuleLoader__.load({
       const [report, setReport] = useState(null)
       const [loading, setLoading] = useState(true)
       const [deepScanning, setDeepScanning] = useState(false)
+      const [cleaningGhosts, setCleaningGhosts] = useState(false)
       const [error, setError] = useState(null)
       const [tab, setTab] = useState('overview')
       const [filter, setFilter] = useState('all')
@@ -2494,6 +2509,20 @@ window.__ModuleLoader__.load({
         setDeep(next)
         await load(next, true, next)
       }, [deep, load])
+
+      const cleanGhostSessions = useCallback(async () => {
+        setCleaningGhosts(true)
+        try {
+          const result = await api('/api/ghost-sessions', { method: 'POST', body: {} })
+          const count = result?.removedCount ?? 0
+          notify(count > 0 ? t('sessions.ghostDone', { n: count }) : t('sessions.ghostNone'))
+          await refresh(true)
+        } catch (cause) {
+          notify(t('toast.failed', { message: cause instanceof Error ? cause.message : String(cause) }))
+        } finally {
+          setCleaningGhosts(false)
+        }
+      }, [notify, refresh, t])
 
       const measureWorkspaceSizes = useCallback(async () => {
         setMeasuringWorkspaces(true)
@@ -2801,6 +2830,7 @@ window.__ModuleLoader__.load({
             report,
             deep,
             deepScanning,
+            cleaningGhosts,
             filteredSessions,
             selected,
             query,
@@ -2808,6 +2838,7 @@ window.__ModuleLoader__.load({
             filter,
             setFilter,
             onToggleDeep: () => void toggleDeep(),
+            onCleanGhosts: () => void cleanGhostSessions(),
             onClearSelection: () => setSelected(new Set()),
             onToggleAll: toggleAll,
             onToggleRow: toggleRow,
