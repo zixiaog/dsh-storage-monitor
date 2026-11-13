@@ -54,6 +54,10 @@
     "node": ">=20"
   },
   "dsh": {
+    "catalog": {
+      "category": "dev",
+      "summary": "DSH 存储占用分析：分类统计插件、缓存、会话与附件的空间占用，图表化展示、安全清理、会话回收站，并支持把 DSH 数据目录迁移到其它磁盘。"
+    },
     "bundle": {
       "patch": "./cordis.patch.yml"
     },
